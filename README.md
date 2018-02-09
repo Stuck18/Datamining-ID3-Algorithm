@@ -45,4 +45,4 @@ With this representation, the DT(and the output from the program for the above d
 )
 ```
 Note: the corresponding DT is as follows:
-![DT Example](/DTExample.png)
+![DT Example](/DTExample.PNG)
