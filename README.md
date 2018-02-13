@@ -46,3 +46,18 @@ With this representation, the DT(and the output from the program for the above d
 ```
 Note: the corresponding DT is as follows:
 ![DT Example](/DTExample.PNG)
+
+After building a decision tree, the program should allow us to classify new samples. Add a function, **classify**, that makes as an argument a sample, represented as a dictionary with the attribute:value pairs of the new sample. The function should return the class classification of the new sample. For example the function returns True for the test sample:
+```pyhon
+{"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}
+```
+and False on the sample:
+```python
+{"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"} 
+```
+
+The code should handle unexpected and and missing attribute values. For example, if we encounter a test sample with "level":"Intern", classify to the most common class. The code should be tested on samples with missing or unexpected values, such as:
+```python
+{"level" : "Intern"} # True
+{"level" : "Senior"} # False 
+```
