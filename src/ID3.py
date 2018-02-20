@@ -6,30 +6,232 @@ Seth Tucker
 from collections import Counter
 import math
 import copy
+import sys
 
-training_data = [
-	({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
-	({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'yes'}, False),
-	({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
-	({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
-	({'level':'Junior', 'lang':'R', 'tweets':'yes', 'phd':'no'}, True),
-	({'level':'Junior', 'lang':'R', 'tweets':'yes', 'phd':'yes'}, False),
-	({'level':'Mid', 'lang':'R', 'tweets':'yes', 'phd':'yes'}, True),
-	({'level':'Senior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, False),
-	({'level':'Senior', 'lang':'R', 'tweets':'yes', 'phd':'no'}, True),
-	({'level':'Junior', 'lang':'Python', 'tweets':'yes', 'phd':'no'}, True),
-	({'level':'Senior', 'lang':'Python', 'tweets':'yes', 'phd':'yes'}, True),
-	({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, True),
-	({'level':'Mid', 'lang':'Java', 'tweets':'yes', 'phd':'no'}, True),
-	({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
+# training_data = [
+# 	({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
+# 	({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'yes'}, False),
+# 	({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
+# 	({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
+# 	({'level':'Junior', 'lang':'R', 'tweets':'yes', 'phd':'no'}, True),
+# 	({'level':'Junior', 'lang':'R', 'tweets':'yes', 'phd':'yes'}, False),
+# 	({'level':'Mid', 'lang':'R', 'tweets':'yes', 'phd':'yes'}, True),
+# 	({'level':'Senior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, False),
+# 	({'level':'Senior', 'lang':'R', 'tweets':'yes', 'phd':'no'}, True),
+# 	({'level':'Junior', 'lang':'Python', 'tweets':'yes', 'phd':'no'}, True),
+# 	({'level':'Senior', 'lang':'Python', 'tweets':'yes', 'phd':'yes'}, True),
+# 	({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, True),
+# 	({'level':'Mid', 'lang':'Java', 'tweets':'yes', 'phd':'no'}, True),
+# 	({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
+# ]
+
+training_data = [ ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'4','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'4','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'4','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'4','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'4','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'4','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'3','persons':'more','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'2','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'2','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'high','doors':'4','persons':'more','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'low','doors':'5more','persons':'more','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'vhigh','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'vhigh','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'vhigh','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'high','maint':'med','doors':'4','persons':'more','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'4','persons':'more','lug_boots':'med','safety':'med'},'acc'),
+    ({'buying':'high','maint':'med','doors':'4','persons':'more','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'high','maint':'med','doors':'4','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'4','persons':'more','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'high','maint':'med','doors':'4','persons':'more','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'med','safety':'med'},'acc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'high','maint':'med','doors':'5more','persons':'4','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'med','safety':'med'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'4','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'med','safety':'med'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'high','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'2','persons':'4','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'4','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'vhigh','doors':'4','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'2','persons':'more','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'med','maint':'med','doors':'2','persons':'more','lug_boots':'big','safety':'high'},'vgood'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'small','safety':'med'},'acc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'med','safety':'med'},'acc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'med','doors':'3','persons':'4','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'4','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'med','safety':'med'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'med','maint':'high','doors':'3','persons':'more','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'med','maint':'low','doors':'2','persons':'4','lug_boots':'small','safety':'med'},'acc'),
+    ({'buying':'med','maint':'low','doors':'2','persons':'4','lug_boots':'small','safety':'high'},'good'),
+    ({'buying':'med','maint':'low','doors':'2','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'3','persons':'more','lug_boots':'med','safety':'high'},'vgood'),
+    ({'buying':'med','maint':'low','doors':'3','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'3','persons':'more','lug_boots':'big','safety':'med'},'good'),
+    ({'buying':'med','maint':'low','doors':'3','persons':'more','lug_boots':'big','safety':'high'},'vgood'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'4','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'5more','persons':'more','lug_boots':'med','safety':'high'},'vgood'),
+    ({'buying':'med','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'med','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'med'},'good'),
+    ({'buying':'med','maint':'low','doors':'5more','persons':'more','lug_boots':'big','safety':'high'},'vgood'),
+    ({'buying':'med','maint':'high','doors':'2','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'4','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'2','persons':'more','lug_boots':'big','safety':'high'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'small','safety':'high'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'med','safety':'high'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'big','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'2','lug_boots':'big','safety':'high'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'small','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'small','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'small','safety':'high'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'med','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'med','safety':'med'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'med','safety':'high'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'big','safety':'low'},'unacc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'big','safety':'med'},'acc'),
+    ({'buying':'low','maint':'vhigh','doors':'3','persons':'4','lug_boots':'big','safety':'high'},'acc')
 ]
 
 def Gain(A, class_list, D):
+
 
 	attribute_gain = I(training_data, class_list) - E(A, class_list, D)
 	return attribute_gain
 
 def E(A, class_list, D):
+
 
 	attr_value_list = {}
 	for value in range(0, len(D)):
@@ -39,16 +241,15 @@ def E(A, class_list, D):
 		else:
 			attr_value_list[attr] += 1
 
-
 	output = {}
 	for val in attr_value_list:
 		output[val] = (subSet(A, val, D))
-
 
 # Sum Loop starts
 	total = 0
 	for key in attr_value_list:
 		total += (attr_value_list[key] / len(D)) * (I(output[key], class_list))
+
 	return total
 
 def subSet(A, val, D):
@@ -105,16 +306,17 @@ def ID3(D, attribute_list, class_list, class_list2):
 	# If attribute_list is empty, return N as leaf node labeled with most common
 	# class in the training samples (majority voting)
 
+
 	highest = 0
 	test_class = ""
 	for i in class_list2:
 		if class_list2[i] > highest:
 			highest = class_list2[i]
-
 			test_class = i
+
+
 	if not attribute_list:
 		N = test_class
-		print("2 : ", N)
 		return N
 
 	# Select test_attribute, the attribute among attribute_list with the highest info gain
@@ -124,6 +326,8 @@ def ID3(D, attribute_list, class_list, class_list2):
 	info_gains = {}
 	for A in attribute_list:
 		info_gains[A] = Gain(A, class_list, D)
+
+
 	highest = 0
 	test_attribute = ''
 	for val in info_gains:
@@ -146,13 +350,17 @@ def ID3(D, attribute_list, class_list, class_list2):
 	for val in attr_value_list:
 		subset = subSet(test_attribute, val, D)
 		if not subset:
+
 			N[1][val] = test_class
+
 		else:
 			if test_attribute in attribute_list:
 				attribute_list.remove(test_attribute)
+
 			temp = ID3(subset, attribute_list, class_list, class_list2)
 
 			N[1][val] = temp
+
 	return N
 
 def classify(DT, sample):
@@ -162,11 +370,13 @@ def classify(DT, sample):
 	return output
 
 def main():
+	sys.setrecursionlimit(1000000)
 	# List of training data attributes
 	attribute_list = []
 	temp = training_data[0][0]
 	for elem in temp:
 		attribute_list.append(elem)
+
 
 	class_list = {}
 	class_list2 = {}
@@ -178,10 +388,11 @@ def main():
 			class_list[(training_data[label][1])] += 1
 			class_list2[(training_data[label][1])] += 1
 
+
 	# Call to ID3 function
 	DT = ID3(training_data, attribute_list, class_list, class_list2)
 	print(DT)
-	sample = {'level':'Junior', 'lang':'Java', 'tweets':'yes', 'phd':'yes'}
-	print(classify(DT, sample))
+	# sample = {'level':'Junior', 'lang':'Java', 'tweets':'yes', 'phd':'yes'}
+	# print(classify(DT, sample))
 
 main()
