@@ -225,14 +225,10 @@ training_data = [ ({'buying':'vhigh','maint':'vhigh','doors':'2','persons':'2','
 ]
 
 def Gain(A, class_list, D):
-
-
 	attribute_gain = I(training_data, class_list) - E(A, class_list, D)
 	return attribute_gain
 
 def E(A, class_list, D):
-
-
 	attr_value_list = {}
 	for value in range(0, len(D)):
 		attr = D[value][0].get(A)
@@ -245,7 +241,6 @@ def E(A, class_list, D):
 	for val in attr_value_list:
 		output[val] = (subSet(A, val, D))
 
-# Sum Loop starts
 	total = 0
 	for key in attr_value_list:
 		total += (attr_value_list[key] / len(D)) * (I(output[key], class_list))
@@ -264,7 +259,6 @@ def subSet(A, val, D):
 
 # Compute the info needed to classify an object
 def I(S, class_list):
-
 	for i in class_list:
 		class_list[i] = 0
 	total = 0
@@ -286,13 +280,7 @@ def I(S, class_list):
 
 	return output
 
-
-
-
 def ID3(D, attribute_list, class_list, class_list2):
-	# Create node N
-
-	# If samples are all of the same class, return N as leaf node labeled with class C
 	one_class = True
 	temp_class = D[0][1]
 	for i in range(0, len(D)):
@@ -305,8 +293,6 @@ def ID3(D, attribute_list, class_list, class_list2):
 
 	# If attribute_list is empty, return N as leaf node labeled with most common
 	# class in the training samples (majority voting)
-
-
 	highest = 0
 	test_class = ""
 	for i in class_list2:
@@ -321,12 +307,9 @@ def ID3(D, attribute_list, class_list, class_list2):
 
 	# Select test_attribute, the attribute among attribute_list with the highest info gain
 	# c1 = True, c2 = False, |c1| = s1 = 9, |c2| = s2 = 5, |S| = s1 + s2 = 14
-
-
 	info_gains = {}
 	for A in attribute_list:
 		info_gains[A] = Gain(A, class_list, D)
-
 
 	highest = 0
 	test_attribute = ''
@@ -334,7 +317,6 @@ def ID3(D, attribute_list, class_list, class_list2):
 		if info_gains[val] > highest:
 			highest = info_gains[val]
 			test_attribute = val
-
 
 	N = (test_attribute, {})
 
@@ -346,13 +328,10 @@ def ID3(D, attribute_list, class_list, class_list2):
 		else:
 			attr_value_list[attr] += 1
 
-
 	for val in attr_value_list:
 		subset = subSet(test_attribute, val, D)
 		if not subset:
-
 			N[1][val] = test_class
-
 		else:
 			if test_attribute in attribute_list:
 				attribute_list.remove(test_attribute)
@@ -377,7 +356,6 @@ def main():
 	for elem in temp:
 		attribute_list.append(elem)
 
-
 	class_list = {}
 	class_list2 = {}
 	for label in range(0, len(training_data)):
@@ -387,7 +365,6 @@ def main():
 		else:
 			class_list[(training_data[label][1])] += 1
 			class_list2[(training_data[label][1])] += 1
-
 
 	# Call to ID3 function
 	DT = ID3(training_data, attribute_list, class_list, class_list2)
